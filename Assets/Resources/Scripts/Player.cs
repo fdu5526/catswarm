@@ -14,15 +14,22 @@ public class Player : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		inputs = new bool[inputStrings.Length];
-		speed = 10f;
+		speed = 80f;
 	}
 
 
   // do physics stuff
   void FixedUpdate () {
-    if (inputs[0] || inputs[1]) {
-    	GetComponent<Rigidbody>().AddForce(Vector3.forward * speed);
-    }
+  	if (inputs[0] || inputs[1]) {
+  		Vector3 f = Vector3.forward;
+	    if (inputs[0]) {
+	    	f += Vector3.left;
+	    } else {
+	    	f += Vector3.right;
+	    }
+	    GetComponent<Rigidbody>().AddForce(f * speed);
+  	}
+  	
   }
 	
 	// Update is called once per frame
@@ -31,7 +38,7 @@ public class Player : MonoBehaviour {
       return;
     }
     for (int i = 0; i < inputStrings.Length; i++) {
-      inputs[i] = Input.GetKey(inputStrings[i]);
+      inputs[i] = Input.GetKeyDown(inputStrings[i]);
     }
 	}
 }
