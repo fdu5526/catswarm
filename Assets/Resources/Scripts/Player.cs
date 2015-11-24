@@ -3,18 +3,23 @@ using System.Collections;
 
 public class Player : MonoBehaviour {
 
+	// player movement
+	const float maxSpeed = 80f;
+	const float deltaSpeed = 4f;
 	float speed;
 
+	// state machine
 	enum State {Walking, Dead};
 	State currentState;
 
+	// user inputs
 	string[] inputStrings = {"a", "d"};
   bool[] inputs;
 
 	// Use this for initialization
 	void Start () {
 		inputs = new bool[inputStrings.Length];
-		speed = 80f;
+		speed = maxSpeed;
 	}
 
 
@@ -29,8 +34,21 @@ public class Player : MonoBehaviour {
 	    }
 	    GetComponent<Rigidbody>().AddForce(f * speed);
   	}
-  	
   }
+
+
+  public void GetLatched () {
+  	speed -= deltaSpeed;
+  	if (speed <= 0f) {
+  		currentState = State.Dead;
+  	}
+  }
+
+  public void GetUnlatched () {
+  	speed = Mathf.Min(speed + deltaSpeed, maxSpeed);
+  }
+
+
 	
 	// Update is called once per frame
 	void Update () {

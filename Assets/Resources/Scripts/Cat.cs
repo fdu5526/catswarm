@@ -4,10 +4,11 @@ using System.Collections;
 public class Cat : MonoBehaviour {
 
 	float speed;
+	
 	GameObject player;
+
 	enum State { RunToward, Latched };
 	State currentState;
-
 
 
 	// Use this for initialization
