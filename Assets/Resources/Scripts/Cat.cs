@@ -12,6 +12,8 @@ public class Cat : MonoBehaviour {
 	State currentState;
 
 	Vector3 prevPlayerPosition;
+	float prevMeowTime;
+	float meowWaitTime;
 
 	AudioSource[] audios;
 
@@ -21,6 +23,7 @@ public class Cat : MonoBehaviour {
 		speed = 5f;
 		isFacingLeft = true;
 		audios = GetComponents<AudioSource>();
+		meowWaitTime = NewMeowWaitTime;
 	}
 
 
@@ -44,9 +47,11 @@ public class Cat : MonoBehaviour {
 
 	float RandomEuler { get { return UnityEngine.Random.Range(20f, 70f); } }
 	float RandomHeight { get { return UnityEngine.Random.Range(0f, 3f); } }
+	float NewMeowWaitTime { get { return UnityEngine.Random.Range(5f, 20f); } }
 
 	void LatchOn () {
 		currentState = State.Latched;
+		GetComponent<Animator>().SetTrigger("Latch");
 		GetComponent<Collider>().enabled = false;
 		GetComponent<Rigidbody>().useGravity = false;
 
@@ -66,7 +71,7 @@ public class Cat : MonoBehaviour {
 		GetComponent<SpriteRenderer>().sortingOrder = 1;
 		player.GetComponent<Player>().GetLatched();
 
-		audios[UnityEngine.Random.Range(0, audios.Length)].Play();
+		audios[audios.Length - 1].Play();
 	}
 
 
@@ -99,5 +104,10 @@ public class Cat : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () {
 		StateTransitions();
+		if(Time.time - prevMeowTime > meowWaitTime) {
+			audios[UnityEngine.Random.Range(0, audios.Length - 1)].Play();
+			prevMeowTime = Time.time;
+			meowWaitTime = NewMeowWaitTime;
+		}
 	}
 }
