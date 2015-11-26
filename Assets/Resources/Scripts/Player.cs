@@ -40,7 +40,7 @@ public class Player : MonoBehaviour {
 
 
   public void GetLatched () {
-  	speed -= deltaSpeed;
+  	speed = Mathf.Max(speed - deltaSpeed, 0f);
   	if (speed <= 0f) {
   		currentState = State.Dead;
   	}
