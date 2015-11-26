@@ -7,19 +7,28 @@ public class Player : MonoBehaviour {
 	const float maxSpeed = 80f;
 	const float deltaSpeed = 4f;
 	float speed;
+	bool isFacingLeft;
 
 	// state machine
 	enum State {Walking, Dead};
 	State currentState;
 
+	float prevFootstepTime;
+	float footstepWaitTime;
+
 	// user inputs
 	string[] inputStrings = {"a", "d"};
   bool[] inputs;
+
+  AudioSource[] audios;
 
 	// Use this for initialization
 	void Start () {
 		inputs = new bool[inputStrings.Length];
 		speed = maxSpeed;
+		audios = GetComponents<AudioSource>();
+		prevFootstepTime = Time.time;
+		footstepWaitTime = 100000f;
 	}
 
 
@@ -35,15 +44,49 @@ public class Player : MonoBehaviour {
 	    GetComponent<Rigidbody>().AddForce(f * speed);
   	}
 
-  	GetComponent<Animator>().speed = GetComponent<Rigidbody>().velocity.magnitude / maxSpeed * 5f;
+
+		float x = GetComponent<Rigidbody>().velocity.x;
+		if (!isFacingLeft && x < 0f) {
+    	isFacingLeft = true;
+    	Vector3 s = GetComponent<Transform>().localScale;
+    	GetComponent<Transform>().localScale = new Vector3(-s.x, s.y, s.z);
+    } else if (isFacingLeft && x > 0f) {
+    	isFacingLeft = false;
+    	Vector3 s = GetComponent<Transform>().localScale;
+    	GetComponent<Transform>().localScale = new Vector3(-s.x, s.y, s.z);
+    }
+
+  	float r = GetComponent<Rigidbody>().velocity.magnitude / maxSpeed;
+  	GetComponent<Animator>().speed = r * 8f;
+
+  	if (r > 0.01f) {
+  		footstepWaitTime = 0.04f / r;
+	  	if (Time.time - prevFootstepTime > footstepWaitTime) {
+	  		prevFootstepTime = Time.time;
+	  		audios[UnityEngine.Random.Range(0, audios.Length)].Play();
+	  	}
+  	}
+  	
+  	
+
+  	
+  }
+
+  void Die () {
+  	GameObject.Find("Canvas/Death").GetComponent<DeathScreen>().Activate();
   }
 
 
   public void GetLatched () {
-  	speed = Mathf.Max(speed - deltaSpeed, 0f);
-  	if (speed <= 0f) {
-  		currentState = State.Dead;
+  	if (currentState != State.Dead) {
+			speed = Mathf.Max(speed - deltaSpeed, 0f);
+	  	if (speed <= 0f) {
+	  		currentState = State.Dead;
+	  		Invoke("Die", 5f);
+	  		
+	  	}
   	}
+	  	
   }
 
   public void GetUnlatched () {
