@@ -34,6 +34,8 @@ public class Player : MonoBehaviour {
 	    }
 	    GetComponent<Rigidbody>().AddForce(f * speed);
   	}
+
+  	GetComponent<Animator>().speed = GetComponent<Rigidbody>().velocity.magnitude / maxSpeed * 5f;
   }
 
 
@@ -55,6 +57,7 @@ public class Player : MonoBehaviour {
 		if (currentState == State.Dead) {
       return;
     }
+
     for (int i = 0; i < inputStrings.Length; i++) {
       inputs[i] = Input.GetKeyDown(inputStrings[i]);
     }
